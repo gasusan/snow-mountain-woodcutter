@@ -1,0 +1,12 @@
+{
+  "name": "snow-mountain-woodcutter",
+  "version": "1.0.0",
+  "description": "A cozy incremental log-chopping game",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}
