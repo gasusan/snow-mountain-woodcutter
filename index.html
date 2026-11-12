@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>雪山の丸太割り</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="snow" aria-hidden="true"></div>
+<header class="topbar">
+  <div class="brand"><span class="brand-icon">🪓</span><div><b>SNOW MOUNTAIN</b><small>WOODCUTTER</small></div></div>
+  <div class="top-stats">
+    <div><small>所持金</small><b id="money">0 G</b></div>
+    <div><small>薪</small><b id="wood">0</b></div>
+    <div><small>レベル</small><b id="levelTop">1</b></div>
+  </div>
+  <div class="volume-control"><span>♫</span><input id="volumeSlider" type="range" min="0" max="100" value="35" aria-label="BGM音量"><b id="volumeValue">35%</b></div>
+</header>
+
+<main>
+  <section class="hero-panel">
+    <div class="scene-head">
+      <div><span class="eyebrow">YOUR LITTLE CABIN IN THE SNOW</span><h1>雪山の丸太割り</h1><p id="weatherLine">静かな雪山。今日も薪を割ろう。</p></div>
+      <div class="weather-pill" id="weather">❄️ 雪</div>
+    </div>
+    <div class="scene">
+      <div class="moon"></div><div class="mountain m-back"></div><div class="mountain m-front"></div>
+      <div class="pine pine1">🌲</div><div class="pine pine2">🌲</div><div class="cabin"><div class="roof"></div><div class="window w1"></div><div class="window w2"></div><div class="door"></div><div class="smoke">☁</div></div>
+      <div class="snow-ground"></div><div class="pet-backdrop" id="petBackdrop" aria-hidden="true"></div>
+      <div class="stump-area">
+        <div class="log" id="log"><span class="ring"></span><span class="grain"></span></div>
+        <div class="stump"></div>
+        <button class="axe-hit" id="chopBtn" aria-label="丸太を割る"><span>🪓</span><b>クリック / 長押しで割る</b></button>
+        <div class="hit-fx" id="hitFx"></div>
+      </div>
+      <div class="scene-caption"><span id="woodName">普通の丸太</span><span id="logHpText">耐久 10 / 10</span></div>
+    </div>
+    <div class="workbar">
+      <div class="workbar-top"><span>丸太の耐久力</span><b id="hpLabel">10 / 10</b></div>
+      <div class="bar"><i id="hpBar"></i></div>
+      <div class="work-actions"><span id="chopHint">斧を振って丸太を割ろう！</span><span id="combo">🔥 0 COMBO</span></div>
+    </div>
+  </section>
+
+  <section class="quick-grid">
+    <div class="quick-card"><span>🪵</span><div><small>累計で割った丸太</small><b id="totalLogs">0</b></div></div>
+    <div class="quick-card"><span>💪</span><div><small>1回の基本ダメージ</small><b id="damage">1</b></div></div>
+    <div class="quick-card"><span>✨</span><div><small>クリティカル率</small><b id="crit">5%</b></div></div>
+    <div class="quick-card"><span>🌟</span><div><small>経験値</small><b id="xp">0 / 20</b></div></div>
+  </section>
+
+  <nav class="tabs" id="tabs">
+    <button class="tab active" data-tab="growth">🌱 成長</button>
+    <button class="tab" data-tab="shop">🛒 ショップ</button>
+    <button class="tab" data-tab="forest">🌲 森と探索</button>
+    <button class="tab" data-tab="quests">📜 依頼・実績</button>
+    <button class="tab" data-tab="cabin">🏠 山小屋</button>
+  </nav>
+
+  <section class="tab-page active" id="page-growth">
+    <div class="section-title"><div><span class="eyebrow">BECOME A MASTER</span><h2>成長と強化</h2></div><span class="tag">育成</span></div>
+    <div class="level-card">
+      <div class="level-emblem">🏔️</div><div class="level-info"><div class="level-line"><b>木こりレベル <span id="level">1</span></b><span id="skillPoints">スキルポイント 0</span></div><div class="bar xpbar"><i id="xpBar"></i></div><small id="xpText">経験値 0 / 20</small></div>
+    </div>
+    <div class="upgrade-grid" id="upgradeGrid"></div>
+    <div class="section-title sub"><div><span class="eyebrow">SKILL TREE</span><h2>木こりスキル</h2></div><small>レベルアップで獲得</small></div>
+    <div class="skill-grid" id="skillGrid"></div><div class="section-title sub"><div><span class="eyebrow">ACTIVE EFFECTS</span><h2>現在の効果・倍率</h2></div></div><div id="effectSummary" class="effect-summary"></div>
+  </section>
+
+  <section class="tab-page" id="page-shop">
+    <div class="section-title"><div><span class="eyebrow">TOOLS & MATERIALS</span><h2>道具屋</h2></div><span class="tag">購入</span></div>
+    <div class="section-title sub market-top"><div><span class="eyebrow">WOOD MARKET</span><h2>薪を売る</h2></div><small>木材は売却しても図鑑記録に残る</small></div>
+    <div class="sell-card market-top"><div><b>🪵 薪のまとめ売り</b><small>持っている薪を指定数だけ売却</small></div><input id="sellAmount" type="number" min="1" value="10"><button class="primary" id="sellBtn">売却</button><button class="secondary" id="sellAllBtn">全部売る</button></div>
+    <div id="woodInventory" class="wood-inventory market-top"></div>
+    <div class="shop-feature"><div class="shop-art">🪓</div><div><h3>斧の鍛冶屋</h3><p>より強い斧なら、硬い木も簡単に割れる。</p><b id="axeName">古い斧</b></div><button class="primary" id="buyAxe">強化する</button></div>
+    <div class="upgrade-grid" id="shopGrid"></div>
+    
+  </section>
+
+  <section class="tab-page" id="page-forest">
+    <div class="section-title"><div><span class="eyebrow">THE FROZEN WILDERNESS</span><h2>森と探索</h2></div><span class="tag">冒険</span></div>
+    <div class="forest-card"><div class="forest-art">🌲🌲🏔️🌲</div><div><h3>雪山の奥へ探索に出る</h3><p>時間をかけて珍しい木材やコイン、素材を見つけよう。探索中も丸太割りはできる。</p><div class="explore-meta"><span>⏱️ <b id="exploreTime">30秒</b></span><span>🎒 発見報酬あり</span></div><button class="primary" id="exploreBtn">探索に出発</button><div class="bar"><i id="exploreBar"></i></div><small id="exploreStatus">準備完了</small></div></div>
+    <div class="section-title sub"><div><span class="eyebrow">WOOD COLLECTION</span><h2>木材図鑑</h2></div><small>新しい森を解放しよう</small></div>
+    <div class="forest-list" id="forestList"></div>
+    <div class="section-title sub"><div><span class="eyebrow">TODAY'S WEATHER</span><h2>山の天気</h2></div></div>
+    <div class="weather-card" id="weatherDetail"></div>
+  </section>
+
+  <section class="tab-page" id="page-quests">
+    <div class="section-title"><div><span class="eyebrow">DAILY WORK</span><h2>依頼と実績</h2></div><span class="tag">報酬</span></div>
+    <div class="daily-card" id="dailyCard"></div>
+    <div class="section-title sub"><div><span class="eyebrow">ACHIEVEMENTS</span><h2>実績一覧</h2></div><small id="achievementCount">0 / 0</small></div>
+    <div class="achievement-list" id="achievementList"></div>
+  </section>
+
+  <section class="tab-page" id="page-cabin">
+    <div class="section-title"><div><span class="eyebrow">HOME SWEET HOME</span><h2>山小屋</h2></div><span class="tag">生活</span></div>
+    <div class="cabin-card"><div class="cabin-big">🏡</div><div><h3>あたたかな山小屋</h3><p>作業環境を整えると、木こり生活がもっと快適になる。</p><b id="cabinLevel">小屋レベル 1</b><button class="primary" id="upgradeCabin">小屋を改築</button></div></div>
+    <div class="upgrade-grid" id="cabinGrid"></div>
+    <div class="section-title sub"><div><span class="eyebrow">YOUR COMPANIONS</span><h2>相棒たち</h2></div><small>探索や作業を手伝ってくれる</small></div>
+    <div class="pet-grid" id="petGrid"></div>
+    <div class="section-title sub"><div><span class="eyebrow">STAR SKILL TREE</span><h2>山の星スキル</h2></div><small>転生で獲得した星を消費</small></div><div id="starSkillGrid" class="skill-grid"></div><div class="section-title sub"><div><span class="eyebrow">LEGEND OF THE MOUNTAIN</span><h2>山の伝説（転生）</h2></div></div>
+    <div class="prestige-card"><div class="prestige-icon">🏔️</div><div><h3>山の記憶を受け継ぐ</h3><p>木こりレベル30で解放。所持金や通常強化をリセットする代わりに「山の星」を獲得。永久ボーナスを得て、さらに高みを目指そう。</p><b id="prestigeInfo">山の星 0 / 転生未解放</b><button class="danger" id="prestigeBtn" disabled>転生する</button></div></div>
+    <div class="section-title sub"><div><span class="eyebrow">SAVE DATA</span><h2>セーブ管理</h2></div></div>
+    <div class="save-card"><button class="secondary" id="exportBtn">セーブコードを書き出す</button><button class="secondary" id="importBtn">セーブコードを読み込む</button><button class="danger" id="resetBtn">最初からやり直す</button><small>通常は自動保存されます。セーブコードは別のPCへ移すときに使えます。</small></div>
+  </section>
+
+  <footer><span>❄ SNOW MOUNTAIN WOODCUTTER</span><span>ゆっくり、コツコツ、山の暮らし。</span></footer>
+</main>
+<div class="toast" id="toast"></div>
+<div class="modal" id="modal"><div class="modal-box"><button class="modal-x" id="modalX">×</button><div id="modalContent"></div></div></div>
+<audio id="bgm" src="Stillness_Beneath_the_Snow.mp3" loop preload="auto"></audio>
+<script src="app.js"></script><script src="v2.js"></script>
+</body></html>
