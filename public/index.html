@@ -15,7 +15,7 @@
     <div><small>薪</small><b id="wood">0</b></div>
     <div><small>レベル</small><b id="levelTop">1</b></div>
   </div>
-  <button class="quiet-btn" id="soundBtn" title="効果音">🔊</button>
+  <div class="volume-control"><span>♫</span><input id="volumeSlider" type="range" min="0" max="100" value="35" aria-label="BGM音量"><b id="volumeValue">35%</b></div>
 </header>
 
 <main>
@@ -27,7 +27,7 @@
     <div class="scene">
       <div class="moon"></div><div class="mountain m-back"></div><div class="mountain m-front"></div>
       <div class="pine pine1">🌲</div><div class="pine pine2">🌲</div><div class="cabin"><div class="roof"></div><div class="window w1"></div><div class="window w2"></div><div class="door"></div><div class="smoke">☁</div></div>
-      <div class="snow-ground"></div>
+      <div class="snow-ground"></div><div class="pet-backdrop" id="petBackdrop" aria-hidden="true"></div>
       <div class="stump-area">
         <div class="log" id="log"><span class="ring"></span><span class="grain"></span></div>
         <div class="stump"></div>
@@ -65,16 +65,17 @@
     </div>
     <div class="upgrade-grid" id="upgradeGrid"></div>
     <div class="section-title sub"><div><span class="eyebrow">SKILL TREE</span><h2>木こりスキル</h2></div><small>レベルアップで獲得</small></div>
-    <div class="skill-grid" id="skillGrid"></div>
+    <div class="skill-grid" id="skillGrid"></div><div class="section-title sub"><div><span class="eyebrow">ACTIVE EFFECTS</span><h2>現在の効果・倍率</h2></div></div><div id="effectSummary" class="effect-summary"></div>
   </section>
 
   <section class="tab-page" id="page-shop">
     <div class="section-title"><div><span class="eyebrow">TOOLS & MATERIALS</span><h2>道具屋</h2></div><span class="tag">購入</span></div>
+    <div class="section-title sub market-top"><div><span class="eyebrow">WOOD MARKET</span><h2>薪を売る</h2></div><small>木材は売却しても図鑑記録に残る</small></div>
+    <div class="sell-card market-top"><div><b>🪵 薪のまとめ売り</b><small>持っている薪を指定数だけ売却</small></div><input id="sellAmount" type="number" min="1" value="10"><button class="primary" id="sellBtn">売却</button><button class="secondary" id="sellAllBtn">全部売る</button></div>
+    <div id="woodInventory" class="wood-inventory market-top"></div>
     <div class="shop-feature"><div class="shop-art">🪓</div><div><h3>斧の鍛冶屋</h3><p>より強い斧なら、硬い木も簡単に割れる。</p><b id="axeName">古い斧</b></div><button class="primary" id="buyAxe">強化する</button></div>
     <div class="upgrade-grid" id="shopGrid"></div>
-    <div class="section-title sub"><div><span class="eyebrow">WOOD MARKET</span><h2>薪を売る</h2></div><small>木材は売却しても図鑑記録に残る</small></div>
-    <div class="sell-card"><div><b>🪵 薪のまとめ売り</b><small>持っている薪を指定数だけ売却</small></div><input id="sellAmount" type="number" min="1" value="10"><button class="primary" id="sellBtn">売却</button><button class="secondary" id="sellAllBtn">全部売る</button></div>
-    <div id="woodInventory" class="wood-inventory"></div>
+    
   </section>
 
   <section class="tab-page" id="page-forest">
@@ -99,7 +100,7 @@
     <div class="upgrade-grid" id="cabinGrid"></div>
     <div class="section-title sub"><div><span class="eyebrow">YOUR COMPANIONS</span><h2>相棒たち</h2></div><small>探索や作業を手伝ってくれる</small></div>
     <div class="pet-grid" id="petGrid"></div>
-    <div class="section-title sub"><div><span class="eyebrow">LEGEND OF THE MOUNTAIN</span><h2>山の伝説（転生）</h2></div></div>
+    <div class="section-title sub"><div><span class="eyebrow">STAR SKILL TREE</span><h2>山の星スキル</h2></div><small>転生で獲得した星を消費</small></div><div id="starSkillGrid" class="skill-grid"></div><div class="section-title sub"><div><span class="eyebrow">LEGEND OF THE MOUNTAIN</span><h2>山の伝説（転生）</h2></div></div>
     <div class="prestige-card"><div class="prestige-icon">🏔️</div><div><h3>山の記憶を受け継ぐ</h3><p>木こりレベル30で解放。所持金や通常強化をリセットする代わりに「山の星」を獲得。永久ボーナスを得て、さらに高みを目指そう。</p><b id="prestigeInfo">山の星 0 / 転生未解放</b><button class="danger" id="prestigeBtn" disabled>転生する</button></div></div>
     <div class="section-title sub"><div><span class="eyebrow">SAVE DATA</span><h2>セーブ管理</h2></div></div>
     <div class="save-card"><button class="secondary" id="exportBtn">セーブコードを書き出す</button><button class="secondary" id="importBtn">セーブコードを読み込む</button><button class="danger" id="resetBtn">最初からやり直す</button><small>通常は自動保存されます。セーブコードは別のPCへ移すときに使えます。</small></div>
@@ -109,5 +110,6 @@
 </main>
 <div class="toast" id="toast"></div>
 <div class="modal" id="modal"><div class="modal-box"><button class="modal-x" id="modalX">×</button><div id="modalContent"></div></div></div>
-<script src="app.js"></script>
+<audio id="bgm" src="Stillness_Beneath_the_Snow.mp3" loop preload="auto"></audio>
+<script src="app.js"></script><script src="v2.js"></script>
 </body></html>

@@ -99,8 +99,8 @@ function renderAll(){renderTop();renderScene();renderGrowth();renderShop();rende
 function tick(){if(s.exploreEnd&&Date.now()>=s.exploreEnd)finishExplore();let dps=autoDps();if(dps>0&&Math.random()<dps/10)chop();renderTop();save()}
 function switchTab(tab){document.querySelectorAll(".tab").forEach(b=>b.classList.toggle("active",b.dataset.tab===tab));document.querySelectorAll(".tab-page").forEach(p=>p.classList.toggle("active",p.id==="page-"+tab))}
 $("tabs").addEventListener("click",e=>{let b=e.target.closest(".tab");if(b)switchTab(b.dataset.tab)});
-$("chopBtn").addEventListener("click",chop);$("chopBtn").addEventListener("pointerdown",e=>{if(e.pointerType==="touch")e.preventDefault()});
-$("buyAxe").onclick=buyAxe;$("sellBtn").onclick=()=>sell(+$("sellAmount").value);$("sellAllBtn").onclick=()=>sell(s.wood);$("exploreBtn").onclick=explore;$("upgradeCabin").onclick=buyCabin;$("prestigeBtn").onclick=prestige;
+$("chopBtn").addEventListener("click",()=>window.chop?window.chop():chop());$("chopBtn").addEventListener("pointerdown",e=>{if(e.pointerType==="touch")e.preventDefault()});
+$("buyAxe").onclick=buyAxe;$("sellBtn").onclick=()=>sell(+$("sellAmount").value);$("sellAllBtn").onclick=()=>sell(s.wood);$("exploreBtn").onclick=explore;$("upgradeCabin").onclick=buyCabin;$("prestigeBtn").onclick=()=>window.prestige?window.prestige():prestige();
 $("soundBtn").onclick=()=>{s.sound=!s.sound;$("soundBtn").textContent=s.sound?"🔊":"🔇";toast(s.sound?"サウンド表示ON":"サウンド表示OFF（効果音は今後追加予定）");save()};
 $("modalX").onclick=closeModal;$("modal").onclick=e=>{if(e.target.id==="modal")closeModal()};
 $("exportBtn").onclick=()=>modal(`<h2>セーブコード</h2><p>このコードをコピーして保管してね。</p><textarea id="saveCode" readonly>${btoa(unescape(encodeURIComponent(JSON.stringify(s))))}</textarea><button class="primary" onclick="navigator.clipboard.writeText(document.getElementById('saveCode').value).then(()=>toast('コピーしました！'))">コードをコピー</button>`);
@@ -109,4 +109,4 @@ function importSave(){try{s={...defaults(),...JSON.parse(decodeURIComponent(esca
 $("resetBtn").onclick=()=>{if(confirm("本当に最初からやり直す？セーブデータも消えるよ。")){localStorage.removeItem("snowWoodSave");s=defaults();renderAll();save();toast("新しい木こり生活の始まり！")}};
 load();chooseWood();renderAll();
 if(s.dailyDay!==new Date().toDateString()){s.dailyDay=new Date().toDateString();s.dailyClaim=false;s.dailyProgress=0}
-setInterval(tick,1000);setInterval(()=>{s.weather=(s.weather+1)%weatherList.length;renderScene();renderForest();save()},90000);
+setInterval(()=>window.tick?window.tick():tick(),1000);setInterval(()=>{s.weather=(s.weather+1)%weatherList.length;renderScene();renderForest();save()},90000);
