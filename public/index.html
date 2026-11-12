@@ -102,6 +102,15 @@
     <div class="pet-grid" id="petGrid"></div>
     <div class="section-title sub"><div><span class="eyebrow">STAR SKILL TREE</span><h2>山の星スキル</h2></div><small>転生で獲得した星を消費</small></div><div id="starSkillGrid" class="skill-grid"></div><div class="section-title sub"><div><span class="eyebrow">LEGEND OF THE MOUNTAIN</span><h2>山の伝説（転生）</h2></div></div>
     <div class="prestige-card"><div class="prestige-icon">🏔️</div><div><h3>山の記憶を受け継ぐ</h3><p>木こりレベル30で解放。所持金や通常強化をリセットする代わりに「山の星」を獲得。永久ボーナスを得て、さらに高みを目指そう。</p><b id="prestigeInfo">山の星 0 / 転生未解放</b><button class="danger" id="prestigeBtn" disabled>転生する</button></div></div>
+    <div class="section-title sub"><div><span class="eyebrow">ACCOUNT & CLOUD SAVE</span><h2>アカウント・クラウドセーブ</h2></div><span class="tag">新機能</span></div>
+    <div class="save-card cloud-account">
+      <div id="cloudStatus" class="cloud-status">未ログイン：このブラウザにセーブされています</div>
+      <label>メールアドレス<input id="accountEmail" type="email" autocomplete="email" placeholder="you@example.com"></label>
+      <label>パスワード<input id="accountPassword" type="password" autocomplete="current-password" minlength="8" placeholder="8文字以上"></label>
+      <div class="cloud-actions"><button class="primary" id="signUpBtn">新規登録</button><button class="secondary" id="signInBtn">ログイン</button><button class="secondary" id="signOutBtn" disabled>ログアウト</button></div>
+      <div class="cloud-actions"><button class="secondary" id="cloudSaveBtn" disabled>今すぐクラウド保存</button><button class="secondary" id="cloudLoadBtn" disabled>クラウドから復元</button></div>
+      <small id="cloudMessage">Supabaseの接続設定後に利用できます。初回ログイン時は既存のブラウザセーブをクラウドへ移行できます。</small>
+    </div>
     <div class="section-title sub"><div><span class="eyebrow">SAVE DATA</span><h2>セーブ管理</h2></div></div>
     <div class="save-card"><button class="secondary" id="exportBtn">セーブコードを書き出す</button><button class="secondary" id="importBtn">セーブコードを読み込む</button><button class="danger" id="resetBtn">最初からやり直す</button><small>通常は自動保存されます。セーブコードは別のPCへ移すときに使えます。</small></div>
   </section>
@@ -111,5 +120,7 @@
 <div class="toast" id="toast"></div>
 <div class="modal" id="modal"><div class="modal-box"><button class="modal-x" id="modalX">×</button><div id="modalContent"></div></div></div>
 <audio id="bgm" src="Stillness_Beneath_the_Snow.mp3" loop preload="auto"></audio>
-<script src="app.js"></script><script src="v2.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script src="app.js"></script><script src="v2.js"></script><script src="cloud.js"></script>
 </body></html>
