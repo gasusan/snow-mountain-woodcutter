@@ -110,3 +110,17 @@ $("resetBtn").onclick=()=>{if(confirm("本当に最初からやり直す？セ�
 load();chooseWood();renderAll();
 if(s.dailyDay!==new Date().toDateString()){s.dailyDay=new Date().toDateString();s.dailyClaim=false;s.dailyProgress=0}
 setInterval(()=>window.tick?window.tick():tick(),1000);setInterval(()=>{s.weather=(s.weather+1)%weatherList.length;renderScene();renderForest();save()},90000);
+
+// Public bridge for the cloud-save module. The actual game state remains private to this script.
+window.getWoodcutterSave = () => JSON.parse(JSON.stringify(s));
+window.applyCloudSave = (data) => {
+  if (!data || typeof data !== "object") throw new Error("セーブデータが正しくありません");
+  const base = defaults();
+  s = { ...base, ...data, up: { ...base.up, ...(data.up || {}) } };
+  s.logType = Math.max(0, Math.min(woods.length - 1, Number(s.logType) || 0));
+  if (!Array.isArray(s.woodBy)) s.woodBy = woods.map(() => 0);
+  if (!Array.isArray(s.pets)) s.pets = [];
+  if (!Array.isArray(s.skills)) s.skills = [];
+  if (!Array.isArray(s.achievements)) s.achievements = [];
+  save(); renderAll();
+};

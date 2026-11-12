@@ -1,7 +1,7 @@
 {
   "name": "snow-mountain-woodcutter",
-  "version": "2.0.0",
-  "description": "A cozy incremental log-chopping game",
+  "version": "3.0.0",
+  "description": "Snow Mountain Woodcutter with Supabase account and cloud saves",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
