@@ -101,7 +101,6 @@ function switchTab(tab){document.querySelectorAll(".tab").forEach(b=>b.classList
 $("tabs").addEventListener("click",e=>{let b=e.target.closest(".tab");if(b)switchTab(b.dataset.tab)});
 $("chopBtn").addEventListener("click",()=>window.chop?window.chop():chop());$("chopBtn").addEventListener("pointerdown",e=>{if(e.pointerType==="touch")e.preventDefault()});
 $("buyAxe").onclick=buyAxe;$("sellBtn").onclick=()=>sell(+$("sellAmount").value);$("sellAllBtn").onclick=()=>sell(s.wood);$("exploreBtn").onclick=explore;$("upgradeCabin").onclick=buyCabin;$("prestigeBtn").onclick=()=>window.prestige?window.prestige():prestige();
-$("soundBtn").onclick=()=>{s.sound=!s.sound;$("soundBtn").textContent=s.sound?"🔊":"🔇";toast(s.sound?"サウンド表示ON":"サウンド表示OFF（効果音は今後追加予定）");save()};
 $("modalX").onclick=closeModal;$("modal").onclick=e=>{if(e.target.id==="modal")closeModal()};
 $("exportBtn").onclick=()=>modal(`<h2>セーブコード</h2><p>このコードをコピーして保管してね。</p><textarea id="saveCode" readonly>${btoa(unescape(encodeURIComponent(JSON.stringify(s))))}</textarea><button class="primary" onclick="navigator.clipboard.writeText(document.getElementById('saveCode').value).then(()=>toast('コピーしました！'))">コードをコピー</button>`);
 $("importBtn").onclick=()=>modal(`<h2>セーブコード読み込み</h2><p>現在のセーブデータは上書きされます。</p><textarea id="loadCode" placeholder="セーブコードを貼り付け"></textarea><button class="primary" onclick="importSave()">読み込む</button>`);
