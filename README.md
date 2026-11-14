@@ -1,46 +1,101 @@
-# 雪山の丸太割り v4.0.2（ゲージ・入力欄修正版）
+# vary
 
-## v4.0.2 修正内容
-- 加工枚数・焚き火納品数の入力値を定期再描画時に保持
-- 焚き火納品数の入力上限を所持木材数と切り離し、納品実行時に所持数まで安全に制限
-- v4.jsのキャッシュ更新
-- 成長欄のプレイヤーレベル経験値ゲージ・数値を1秒ごとに更新し、手動の丸太割り後も即時反映
-- 探索中の進行バー・残り秒数・ボタン状態を1秒ごとに更新
-- タブを開いた瞬間にも進行状況を再描画
-- ゲージ描画処理は表示だけを変更し、経験値・探索時刻・セーブデータを変更しない
+[![NPM Version][npm-image]][npm-url]
+[![NPM Downloads][downloads-image]][downloads-url]
+[![Node.js Version][node-version-image]][node-version-url]
+[![Build Status][travis-image]][travis-url]
+[![Test Coverage][coveralls-image]][coveralls-url]
 
-## v4.0の主な内容
-- 操作直後のローカル自動保存、1秒ごとの保険保存、オフライン中のローカル進行保存
-- オンライン復帰時のクラウド同期キュー（Supabase）
-- オンラインランキング（プレイヤーレベル・累計丸太・累計山の星・所持金）
-- プレイヤーレベルへの統一、木こりスキル3段階、山の星スキル3段階
-- 転生条件をプレイヤーレベル30に統一
-- 新しい木5種、斧3種、実績追加
-- デバフ気候と超レア気候
-- 自動木こり機（750G）
-- 焚き火の一時強化・レベルアップ
-- 木材加工（木材3個→木の板1個）と加工時間短縮
+Manipulate the HTTP Vary header
 
-## Supabaseの追加設定（v4.0）
-既存のSupabaseプロジェクトをそのまま使えます。**v4.0の `supabase/schema.sql` 全体をSupabase SQL Editorで再実行**してください。既存の `game_saves` は維持され、公開ランキング用 `leaderboard_profiles` が追加されます。
+## Installation
 
-ブラウザ側に置くのは既存のProject URLとanon/publishable keyのみです。service_role / secret keyは絶対に使わないでください。
+This is a [Node.js](https://nodejs.org/en/) module available through the
+[npm registry](https://www.npmjs.com/). Installation is done using the
+[`npm install` command](https://docs.npmjs.com/getting-started/installing-npm-packages-locally): 
 
-## GitHub / Renderへの反映
-1. ZIPを解凍します。
-2. リポジトリ内のファイルをv4.0.2の同名ファイルで置き換えます（`public/` と `supabase/` の階層を維持）。
-3. GitHubへアップロードしてRenderのデプロイ完了を待ちます。
-4. v4.0のランキング用SQLをまだ実行していない場合だけ、Supabase SQL Editorで `supabase/schema.sql` を実行します（既存データを削除しない内容です）。
-5. ブラウザでゲームを開き、Windowsなら `Ctrl + F5` で強制再読み込みします。
-6. アカウントでログインしてランキング・クラウド同期を確認します。
+```sh
+$ npm install vary
+```
 
-## セーブについて
-- ゲーム内操作はブラウザのlocalStorageへ即時保存します。
-- 1秒ごとの保険保存も行います。
-- オフライン中の自動木こりは最大12時間分を復帰時に計算します（自動木こり機が必要）。
-- ローカルにクラウド未同期の変更がある場合、復帰時にそのデータを優先して同期するか、クラウドから復元するか確認します。
-- ブラウザデータの消去・端末故障・未同期のままのブラウザプロファイル消失までは防げないため、セーブコードの書き出しも定期的に利用してください。
+## API
 
-## 注意
-- Supabaseのランキングはクライアントから送信される集計値を表示する仕組みです。改ざん耐性のある競技ランキングにするには、将来サーバー側検証が必要です。
-- Supabase Freeの稼働条件やメール送信制限はSupabase側のプランに依存します。
+<!-- eslint-disable no-unused-vars -->
+
+```js
+var vary = require('vary')
+```
+
+### vary(res, field)
+
+Adds the given header `field` to the `Vary` response header of `res`.
+This can be a string of a single field, a string of a valid `Vary`
+header, or an array of multiple fields.
+
+This will append the header if not already listed, otherwise leaves
+it listed in the current location.
+
+<!-- eslint-disable no-undef -->
+
+```js
+// Append "Origin" to the Vary header of the response
+vary(res, 'Origin')
+```
+
+### vary.append(header, field)
+
+Adds the given header `field` to the `Vary` response header string `header`.
+This can be a string of a single field, a string of a valid `Vary` header,
+or an array of multiple fields.
+
+This will append the header if not already listed, otherwise leaves
+it listed in the current location. The new header string is returned.
+
+<!-- eslint-disable no-undef -->
+
+```js
+// Get header string appending "Origin" to "Accept, User-Agent"
+vary.append('Accept, User-Agent', 'Origin')
+```
+
+## Examples
+
+### Updating the Vary header when content is based on it
+
+```js
+var http = require('http')
+var vary = require('vary')
+
+http.createServer(function onRequest (req, res) {
+  // about to user-agent sniff
+  vary(res, 'User-Agent')
+
+  var ua = req.headers['user-agent'] || ''
+  var isMobile = /mobi|android|touch|mini/i.test(ua)
+
+  // serve site, depending on isMobile
+  res.setHeader('Content-Type', 'text/html')
+  res.end('You are (probably) ' + (isMobile ? '' : 'not ') + 'a mobile user')
+})
+```
+
+## Testing
+
+```sh
+$ npm test
+```
+
+## License
+
+[MIT](LICENSE)
+
+[npm-image]: https://img.shields.io/npm/v/vary.svg
+[npm-url]: https://npmjs.org/package/vary
+[node-version-image]: https://img.shields.io/node/v/vary.svg
+[node-version-url]: https://nodejs.org/en/download
+[travis-image]: https://img.shields.io/travis/jshttp/vary/master.svg
+[travis-url]: https://travis-ci.org/jshttp/vary
+[coveralls-image]: https://img.shields.io/coveralls/jshttp/vary/master.svg
+[coveralls-url]: https://coveralls.io/r/jshttp/vary
+[downloads-image]: https://img.shields.io/npm/dm/vary.svg
+[downloads-url]: https://npmjs.org/package/vary
