@@ -56,14 +56,17 @@
     <button class="tab" data-tab="forest">🌲 森と探索</button>
     <button class="tab" data-tab="quests">📜 依頼・実績</button>
     <button class="tab" data-tab="cabin">🏠 山小屋</button>
+    <button class="tab" data-tab="firepit">🔥 焚き火</button>
+    <button class="tab" data-tab="crafting">🪵 木材加工</button>
+    <button class="tab" data-tab="ranking">🏆 ランキング</button>
   </nav>
 
   <section class="tab-page active" id="page-growth">
-    <div class="section-title"><div><span class="eyebrow">BECOME A MASTER</span><h2>成長と強化</h2></div><span class="tag">育成</span></div>
+    <div class="section-title"><div><span class="eyebrow">BECOME A MASTER</span><h2>成長とスキル</h2></div><span class="tag">育成</span></div>
     <div class="level-card">
-      <div class="level-emblem">🏔️</div><div class="level-info"><div class="level-line"><b>木こりレベル <span id="level">1</span></b><span id="skillPoints">スキルポイント 0</span></div><div class="bar xpbar"><i id="xpBar"></i></div><small id="xpText">経験値 0 / 20</small></div>
+      <div class="level-emblem">🏔️</div><div class="level-info"><div class="level-line"><b>プレイヤーレベル <span id="level">1</span></b><span id="skillPoints">スキルポイント 0</span></div><div class="bar xpbar"><i id="xpBar"></i></div><small id="xpText">経験値 0 / 20</small></div>
     </div>
-    <div class="upgrade-grid" id="upgradeGrid"></div>
+    <div class="upgrade-grid" id="upgradeGrid" aria-hidden="true"></div>
     <div class="section-title sub"><div><span class="eyebrow">SKILL TREE</span><h2>木こりスキル</h2></div><small>レベルアップで獲得</small></div>
     <div class="skill-grid" id="skillGrid"></div><div class="section-title sub"><div><span class="eyebrow">ACTIVE EFFECTS</span><h2>現在の効果・倍率</h2></div></div><div id="effectSummary" class="effect-summary"></div>
   </section>
@@ -101,7 +104,7 @@
     <div class="section-title sub"><div><span class="eyebrow">YOUR COMPANIONS</span><h2>相棒たち</h2></div><small>探索や作業を手伝ってくれる</small></div>
     <div class="pet-grid" id="petGrid"></div>
     <div class="section-title sub"><div><span class="eyebrow">STAR SKILL TREE</span><h2>山の星スキル</h2></div><small>転生で獲得した星を消費</small></div><div id="starSkillGrid" class="skill-grid"></div><div class="section-title sub"><div><span class="eyebrow">LEGEND OF THE MOUNTAIN</span><h2>山の伝説（転生）</h2></div></div>
-    <div class="prestige-card"><div class="prestige-icon">🏔️</div><div><h3>山の記憶を受け継ぐ</h3><p>木こりレベル30で解放。所持金や通常強化をリセットする代わりに「山の星」を獲得。永久ボーナスを得て、さらに高みを目指そう。</p><b id="prestigeInfo">山の星 0 / 転生未解放</b><button class="danger" id="prestigeBtn" disabled>転生する</button></div></div>
+    <div class="prestige-card"><div class="prestige-icon">🏔️</div><div><h3>山の記憶を受け継ぐ</h3><p>プレイヤーレベル30で解放。所持金や通常強化をリセットする代わりに「山の星」を獲得。永久ボーナスを得て、さらに高みを目指そう。</p><b id="prestigeInfo">山の星 0 / 転生未解放</b><button class="danger" id="prestigeBtn" disabled>転生する</button></div></div>
     <div class="section-title sub"><div><span class="eyebrow">ACCOUNT & CLOUD SAVE</span><h2>アカウント・クラウドセーブ</h2></div><span class="tag">新機能</span></div>
     <div class="save-card cloud-account">
       <div id="cloudStatus" class="cloud-status">未ログイン：このブラウザにセーブされています</div>
@@ -112,7 +115,29 @@
       <small id="cloudMessage">Supabaseの接続設定後に利用できます。初回ログイン時は既存のブラウザセーブをクラウドへ移行できます。</small>
     </div>
     <div class="section-title sub"><div><span class="eyebrow">SAVE DATA</span><h2>セーブ管理</h2></div></div>
-    <div class="save-card"><button class="secondary" id="exportBtn">セーブコードを書き出す</button><button class="secondary" id="importBtn">セーブコードを読み込む</button><button class="danger" id="resetBtn">最初からやり直す</button><small>通常は自動保存されます。セーブコードは別のPCへ移すときに使えます。</small></div>
+    <div class="save-card"><button class="secondary" id="exportBtn">セーブコードを書き出す</button><button class="secondary" id="importBtn">セーブコードを読み込む</button><button class="danger" id="resetBtn">最初からやり直す</button><small>操作のたびにこの端末へ自動保存されます。ログイン中はクラウドにも自動同期されます。セーブコードはバックアップにも使えます。</small></div>
+  </section>
+
+
+  <section class="tab-page" id="page-firepit">
+    <div class="section-title"><div><span class="eyebrow">WARMTH OF THE MOUNTAIN</span><h2>焚き火</h2></div><span class="tag">一時強化・育成</span></div>
+    <div id="firepitPanel"></div>
+  </section>
+
+  <section class="tab-page" id="page-crafting">
+    <div class="section-title"><div><span class="eyebrow">WOODWORKING</span><h2>木材加工</h2></div><span class="tag">生産</span></div>
+    <div id="craftingPanel"></div>
+  </section>
+
+  <section class="tab-page" id="page-ranking">
+    <div class="section-title"><div><span class="eyebrow">MOUNTAIN LEADERBOARD</span><h2>オンラインランキング</h2></div><span class="tag">競争</span></div>
+    <div class="ranking-profile">
+      <label>ランキング表示名<input id="rankingName" maxlength="18" placeholder="木こりの名前"></label>
+      <button class="secondary" id="saveRankingName">名前を保存</button>
+      <small id="rankingStatus">ログインするとランキングに記録できます。ランキングの閲覧はログインなしでも可能です。</small>
+    </div>
+    <div class="ranking-controls"><select id="rankingMetric"><option value="total_logs">累計丸太破壊数</option><option value="player_level">プレイヤーレベル</option><option value="total_stars">累計獲得・山の星</option><option value="total_money">所持金</option></select><button class="primary" id="refreshRanking">ランキング更新</button></div>
+    <div id="rankingList" class="ranking-list"><div class="ranking-empty">ランキングを読み込んでいます…</div></div>
   </section>
 
   <footer><span>❄ SNOW MOUNTAIN WOODCUTTER</span><span>ゆっくり、コツコツ、山の暮らし。</span></footer>
@@ -122,5 +147,5 @@
 <audio id="bgm" src="Stillness_Beneath_the_Snow.mp3" loop preload="auto"></audio>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase-config.js"></script>
-<script src="app.js"></script><script src="v2.js"></script><script src="cloud.js"></script>
+<script src="app.js"></script><script src="v2.js"></script><script src="v4.js?v=4.0.7"></script><script src="cloud.js"></script>
 </body></html>

@@ -1,7 +1,7 @@
 {
   "name": "snow-mountain-woodcutter",
-  "version": "3.0.0",
-  "description": "Snow Mountain Woodcutter with Supabase account and cloud saves",
+  "version": "4.0.2",
+  "description": "Snow Mountain Woodcutter v4.0.2 with local-first cloud saves, leaderboard, firepit and crafting",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
