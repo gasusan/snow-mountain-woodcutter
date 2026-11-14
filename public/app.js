@@ -7,7 +7,12 @@ const woods=[
  {name:"黒檀",icon:"🪵",hp:750,value:85,xp:45,unlock:15},
  {name:"氷晶樹",icon:"❄️",hp:2200,value:240,xp:100,unlock:22},
  {name:"星降りの木",icon:"🌟",hp:7500,value:700,xp:250,unlock:32},
- {name:"世界樹の枝",icon:"🌌",hp:25000,value:2200,xp:700,unlock:45}
+ {name:"世界樹の枝",icon:"🌌",hp:25000,value:2200,xp:700,unlock:45},
+ {name:"紅葉杉",icon:"🍁",hp:52000,value:4800,xp:1200,unlock:55},
+ {name:"月白樹",icon:"🌙",hp:110000,value:10500,xp:2200,unlock:65},
+ {name:"雷鳴樹",icon:"⚡",hp:240000,value:24000,xp:4200,unlock:78},
+ {name:"古代氷樹",icon:"🧊",hp:520000,value:56000,xp:8500,unlock:92},
+ {name:"天界樹",icon:"✨",hp:1150000,value:130000,xp:17000,unlock:110}
 ];
 const upgrades=[
  {id:"power",name:"腕力トレーニング",desc:"丸太に与えるダメージが増える",icon:"💪",base:18,stat:"power"},
@@ -44,8 +49,7 @@ const axeNames=["古い斧","鉄の斧","鋼の斧","銀の斧","氷結の斧","
 const axeCosts=[0,120,600,2500,12000,60000,300000,1500000];
 const weatherList=[["❄️","雪","普通の天気。"],["🌨️","大雪","木材の経験値 +25%。"],["☀️","晴れ","売却価格 +20%。"],["🌬️","吹雪","探索報酬 +30%。"],["🌌","オーロラ","クリティカル率 +5%。"]];
 function save(){s.lastSeen=Date.now();localStorage.setItem("snowWoodSave",JSON.stringify(s))}
-function load(){try{let d=JSON.parse(localStorage.getItem("snowWoodSave"));if(d)s={...defaults(),...d,up:{...defaults().up,...d.up}}}catch(e){};s.logType=Math.max(0,Math.min(woods.length-1,s.logType));if(!s.logHp||s.logHp<=0)s.logHp=woods[s.logType].hp;
- let away=Math.min(8*3600,Math.max(0,(Date.now()-s.lastSeen)/1000));if(away>60){let gain=Math.floor(away*autoDps()*.35);if(gain>0){s.wood+=Math.floor(gain/5);s.money+=Math.floor(gain/5)*Math.max(1,woods[s.logType].value);setTimeout(()=>toast(`おかえり！留守中に薪と ${Math.floor(gain/5)} G 相当を獲得したよ。`),500)}}}
+function load(){try{let d=JSON.parse(localStorage.getItem("snowWoodSave"));if(d)s={...defaults(),...d,up:{...defaults().up,...d.up}}}catch(e){};s.logType=Math.max(0,Math.min(woods.length-1,s.logType));if(!s.logHp||s.logHp<=0)s.logHp=woods[s.logType].hp;if(!Number.isFinite(s.lastSeen))s.lastSeen=Date.now()}
 function cost(base,lv){return Math.floor(base*Math.pow(1.48,lv))}
 function damage(){return Math.max(1,Math.floor((1+s.up.power*2+s.axe*3)*(s.skills.includes("keen")?1.1:1)*(1+s.stars*.08)))}
 function critChance(){return Math.min(75,5+s.up.crit*2+(s.skills.includes("focus")?3:0)+(s.weather===4?5:0))}
@@ -58,10 +62,10 @@ function toast(t){let el=$("toast");el.textContent=t;el.classList.add("show");cl
 function modal(html){$("modalContent").innerHTML=html;$("modal").classList.add("show")}
 function closeModal(){$("modal").classList.remove("show")}
 function chop(){let now=Date.now();if(now-s.lastChop<75)return;s.combo=now-s.lastChop<1800?s.combo+1:1;s.lastChop=now;
- let dmg=damage();let crit=Math.random()*100<critChance();if(crit)dmg=Math.floor(dmg*(2+s.up.critPower*.12));s.logHp-=dmg;
+ let dmg=damage();let crit=Math.random()*100<critChance();if(crit)dmg=Math.floor(dmg*(window.critDamageMultiplier?window.critDamageMultiplier():(2+s.up.critPower*.12)));s.logHp-=dmg;
  $("log").classList.add("hit");setTimeout(()=>$("log").classList.remove("hit"),100);
  $("hitFx").textContent=crit?"💥 CRITICAL!":(s.combo%5===0?"✨":"");$("hitFx").style.left=(35+Math.random()*35)+"%";setTimeout(()=>$("hitFx").textContent="",450);
- if(s.logHp<=0){let w=woods[s.logType];let qty=1+(Math.random()<Math.min(.6,s.up.luck*.025)?1:0);s.wood+=qty;s.woodBy[s.logType]+=qty;s.totalLogs++;s.dailyProgress++;s.money+=0;gainXp(w.xp);if(s.totalLogs===1)toast("初めて丸太を割った！薪を手に入れた。");s.logHp=w.hp;
+ if(s.logHp<=0){let w=woods[s.logType];let extraChance=Math.min(.6,s.up.luck*.025+(s.woodcutterSkills?.high_wood||0)*.03+(s.starSkills?.mid_star_wood||0)*.05);let qty=1+(Math.random()<extraChance?1:0);s.wood+=qty;s.woodBy[s.logType]+=qty;s.totalLogs++;s.dailyProgress++;s.money+=0;gainXp(w.xp);if(s.totalLogs===1)toast("初めて丸太を割った！薪を手に入れた。");s.logHp=w.hp;
    if(Math.random()<.04+s.up.luck*.008){s.money+=w.value*3;toast("✨ 山の幸運！ボーナスコインを発見！")}
    checkAchievements();
  }
@@ -97,18 +101,18 @@ function buyPet(i,c){if(s.pets.includes(i)||s.money<c)return;s.money-=c;s.pets.p
 function prestige(){if(s.level<30)return;let stars=Math.max(1,Math.floor(Math.sqrt(s.totalLogs/100)));if(!confirm(`転生して山の星 ${stars} 個を獲得しますか？ 所持金・レベル・通常強化がリセットされます。`))return;s.stars+=stars;s.prestiges++;let keep={stars:s.stars,prestiges:s.prestiges,achievements:s.achievements,found:s.found};s=defaults();Object.assign(s,keep);s.logHp=woods[0].hp;toast("山の星を受け継いだ！永久ボーナス獲得！");renderAll();save()}
 function renderAll(){renderTop();renderScene();renderGrowth();renderShop();renderForest();renderQuest();renderCabin()}
 function tick(){if(s.exploreEnd&&Date.now()>=s.exploreEnd)finishExplore();let dps=autoDps();if(dps>0&&Math.random()<dps/10)chop();renderTop();save()}
-function switchTab(tab){document.querySelectorAll(".tab").forEach(b=>b.classList.toggle("active",b.dataset.tab===tab));document.querySelectorAll(".tab-page").forEach(p=>p.classList.toggle("active",p.id==="page-"+tab))}
+function switchTab(tab){document.querySelectorAll(".tab").forEach(b=>b.classList.toggle("active",b.dataset.tab===tab));document.querySelectorAll(".tab-page").forEach(p=>p.classList.toggle("active",p.id==="page-"+tab));save()}
 $("tabs").addEventListener("click",e=>{let b=e.target.closest(".tab");if(b)switchTab(b.dataset.tab)});
 $("chopBtn").addEventListener("click",()=>window.chop?window.chop():chop());$("chopBtn").addEventListener("pointerdown",e=>{if(e.pointerType==="touch")e.preventDefault()});
 $("buyAxe").onclick=buyAxe;$("sellBtn").onclick=()=>sell(+$("sellAmount").value);$("sellAllBtn").onclick=()=>sell(s.wood);$("exploreBtn").onclick=explore;$("upgradeCabin").onclick=buyCabin;$("prestigeBtn").onclick=()=>window.prestige?window.prestige():prestige();
 $("modalX").onclick=closeModal;$("modal").onclick=e=>{if(e.target.id==="modal")closeModal()};
 $("exportBtn").onclick=()=>modal(`<h2>セーブコード</h2><p>このコードをコピーして保管してね。</p><textarea id="saveCode" readonly>${btoa(unescape(encodeURIComponent(JSON.stringify(s))))}</textarea><button class="primary" onclick="navigator.clipboard.writeText(document.getElementById('saveCode').value).then(()=>toast('コピーしました！'))">コードをコピー</button>`);
 $("importBtn").onclick=()=>modal(`<h2>セーブコード読み込み</h2><p>現在のセーブデータは上書きされます。</p><textarea id="loadCode" placeholder="セーブコードを貼り付け"></textarea><button class="primary" onclick="importSave()">読み込む</button>`);
-function importSave(){try{s={...defaults(),...JSON.parse(decodeURIComponent(escape(atob($("loadCode").value.trim()))))};save();closeModal();renderAll();toast("セーブデータを読み込んだ！")}catch(e){toast("コードが正しくないみたい…")}}
-$("resetBtn").onclick=()=>{if(confirm("本当に最初からやり直す？セーブデータも消えるよ。")){localStorage.removeItem("snowWoodSave");s=defaults();renderAll();save();toast("新しい木こり生活の始まり！")}};
+function importSave(){try{s={...defaults(),...JSON.parse(decodeURIComponent(escape(atob($("loadCode").value.trim()))))};if(window.ensureWoodcutterV4)window.ensureWoodcutterV4();save();closeModal();renderAll();toast("セーブデータを読み込んだ！")}catch(e){toast("コードが正しくないみたい…")}}
+$("resetBtn").onclick=()=>{if(confirm("本当に最初からやり直す？セーブデータも消えるよ。")){localStorage.removeItem("snowWoodSave");s=defaults();if(window.ensureWoodcutterV4)window.ensureWoodcutterV4();renderAll();save();toast("新しい木こり生活の始まり！")}};
 load();chooseWood();renderAll();
 if(s.dailyDay!==new Date().toDateString()){s.dailyDay=new Date().toDateString();s.dailyClaim=false;s.dailyProgress=0}
-setInterval(()=>window.tick?window.tick():tick(),1000);setInterval(()=>{s.weather=(s.weather+1)%weatherList.length;renderScene();renderForest();save()},90000);
+setInterval(()=>window.tick?window.tick():tick(),1000);setInterval(()=>{if(window.changeWeather)window.changeWeather();else{s.weather=(s.weather+1)%weatherList.length;renderScene();renderForest();save()}},90000);
 
 // Public bridge for the cloud-save module. The actual game state remains private to this script.
 window.getWoodcutterSave = () => JSON.parse(JSON.stringify(s));
@@ -116,6 +120,7 @@ window.applyCloudSave = (data) => {
   if (!data || typeof data !== "object") throw new Error("セーブデータが正しくありません");
   const base = defaults();
   s = { ...base, ...data, up: { ...base.up, ...(data.up || {}) } };
+  if (window.ensureWoodcutterV4) window.ensureWoodcutterV4();
   s.logType = Math.max(0, Math.min(woods.length - 1, Number(s.logType) || 0));
   if (!Array.isArray(s.woodBy)) s.woodBy = woods.map(() => 0);
   if (!Array.isArray(s.pets)) s.pets = [];
