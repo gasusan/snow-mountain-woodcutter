@@ -78,6 +78,9 @@
     const list=$('rankingList'),state=$('rankingStatus');
     if(!client){if(list)list.innerHTML='<div class="ranking-empty">Supabaseの接続設定が必要です。</div>';return;}
     if(list)list.innerHTML='<div class="ranking-empty">ランキングを読み込み中…</div>';
+    // Publish the latest local snapshot before displaying the board. This makes
+    // an explicit ranking refresh update the signed-in player's row immediately.
+    if(user){try{await publishLeaderboard(window.getWoodcutterSave());}catch(publishError){if(state)state.textContent=`ランキング登録を保留中：${publishError.message}`;}}
     const allowed=['total_logs','player_level','total_stars','total_money'];if(!allowed.includes(metric))metric='total_logs';
     try{
       const {data,error}=await client.from('leaderboard_profiles').select('player_name,player_level,total_logs,total_stars,total_money,updated_at').order(metric,{ascending:false}).limit(50);

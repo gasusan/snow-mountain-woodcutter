@@ -224,7 +224,7 @@
   window.speedCrafting=function(){if(!s.craftJob)return;const remaining=s.craftJob.finishAt-now();if(remaining<=0){finishCrafting();return;}const cost=100;if(s.money<cost){toast('時間短縮には100G必要だよ');return;}s.money-=cost;s.craftJob.finishAt=Math.max(now(),s.craftJob.finishAt-60000);toast('Gを使って加工時間を1分短縮！');if(s.craftJob.finishAt<=now())finishCrafting();else{renderAll();save()}};
   window.buyCraftSpeed=function(){const lv=Number(s.craftSpeedLevel||0),cost=Math.floor(500*Math.pow(1.8,lv));if(lv>=15||s.money<cost)return;s.money-=cost;s.craftSpeedLevel=lv+1;toast(`加工時間短縮 Lv.${s.craftSpeedLevel}！開始時の時間が5%短くなったよ`);renderAll();save()};
   function renderCrafting(){const el=$('craftingPanel');if(!el)return;const previousAmount=$('craftAmount')?.value;const job=s.craftJob,remaining=job?Math.max(0,Math.ceil((job.finishAt-now())/1000)):0;const pct=job?Math.max(0,Math.min(100,(1-remaining/Math.max(1,job.totalSeconds))*100)):0;const upgradeCost=Math.floor(500*Math.pow(1.8,s.craftSpeedLevel||0));
-    el.innerHTML=`<div class="craft-card"><h3>🪚 木の板を作ろう</h3><p>木材を加工して、焚き火のレベルアップに使う木の板を作れます。</p><div class="craft-recipe"><div class="recipe-item"><span class="recipe-icon">🪵</span>木材 ×3</div><div style="font-size:24px">➜</div><div class="recipe-item"><span class="recipe-icon">🪚</span>木の板 ×1</div></div><div class="craft-stats"><div><small>所持木材</small><b>${fmt(s.wood)} 個</b></div><div><small>所持木の板</small><b>${fmt(s.planks)} 枚</b></div><div><small>1枚あたりの加工時間</small><b>${Math.ceil(craftSecondsPerPlank())}秒</b></div></div><div class="craft-controls"><label>加工する枚数<input id="craftAmount" type="number" min="1" max="500" value="1" ${job?'disabled':''}></label><button class="primary" onclick="startCrafting()" ${job?'disabled':''}>まとめて加工開始</button></div>${job?`<div class="craft-job"><b>加工中：木の板 ${fmt(job.quantity)}枚</b><div class="craft-progress"><i style="width:${pct}%"></i></div><div>残り時間：<b>${Math.floor(remaining/60)}分 ${remaining%60}秒</b></div><button class="secondary" onclick="speedCrafting()">Gで1分短縮（100G）</button></div>`:'<div class="craft-note">加工は一度にまとめて開始できます。加工中は次の加工を開始できません。</div>'}</div><div class="craft-card"><h3>⚙️ 加工設備の強化</h3><p>強化すると、加工開始時点の基本所要時間が短くなります。加工中にGで短縮する機能とは別です。</p><div class="craft-stats"><div><small>強化レベル</small><b>Lv.${s.craftSpeedLevel}/15</b></div><div><small>基本時間短縮</small><b>${Math.min(75,s.craftSpeedLevel*5)}%</b></div><div><small>次の強化費用</small><b>${s.craftSpeedLevel>=15?'MAX':fmt(upgradeCost)+' G'}</b></div></div><button class="primary" onclick="buyCraftSpeed()" ${s.craftSpeedLevel>=15||s.money<upgradeCost?'disabled':''}>加工設備を強化</button></div>`;
+    el.innerHTML=`<div class="craft-card"><h3>🪚 木の板を作ろう</h3><p>木材を加工して、焚き火のレベルアップに使う木の板を作れます。</p><div class="craft-recipe"><div class="recipe-item"><span class="recipe-icon">🪵</span>木材 ×3</div><div style="font-size:24px">➜</div><div class="recipe-item"><span class="recipe-icon">🪚</span>木の板 ×1</div></div><div class="craft-stats"><div><small>所持木材</small><b>${fmt(s.wood)} 個</b></div><div><small>所持木の板</small><b>${fmt(s.planks)} 枚</b></div><div><small>1枚あたりの加工時間</small><b>${Math.ceil(craftSecondsPerPlank())}秒</b></div></div><div class="craft-controls"><label>加工する枚数<input id="craftAmount" type="number" min="1" max="500" value="1" ${job?'disabled':''}></label><button class="primary" onclick="startCrafting()" ${job?'disabled':''}>まとめて加工開始</button></div>${job?`<div class="craft-job"><b>加工中：木の板 ${fmt(job.quantity)}枚</b><div class="craft-progress"><i id="craftProgressBar" style="width:${pct}%"></i></div><div>残り時間：<b id="craftRemaining">${Math.floor(remaining/60)}分 ${remaining%60}秒</b></div><button class="secondary" onclick="speedCrafting()">Gで1分短縮（100G）</button></div>`:'<div class="craft-note">加工は一度にまとめて開始できます。加工中は次の加工を開始できません。</div>'}</div><div class="craft-card"><h3>⚙️ 加工設備の強化</h3><p>強化すると、加工開始時点の基本所要時間が短くなります。加工中にGで短縮する機能とは別です。</p><div class="craft-stats"><div><small>強化レベル</small><b>Lv.${s.craftSpeedLevel}/15</b></div><div><small>基本時間短縮</small><b>${Math.min(75,s.craftSpeedLevel*5)}%</b></div><div><small>次の強化費用</small><b>${s.craftSpeedLevel>=15?'MAX':fmt(upgradeCost)+' G'}</b></div></div><button class="primary" onclick="buyCraftSpeed()" ${s.craftSpeedLevel>=15||s.money<upgradeCost?'disabled':''}>加工設備を強化</button></div>`;
     if(previousAmount!==undefined&&!job){const input=$('craftAmount');if(input)input.value=previousAmount;}
   }
 
@@ -279,7 +279,14 @@
     const reward=Math.max(Number(s.bestPrestigeReward||1),1+Math.floor((s.level-30)/10)+Math.floor(runLogs/1000));
     if(!confirm(`プレイヤーレベル${s.level}で転生しますか？\n山の星 ${reward} 個を獲得します。\n所持金・レベル・通常強化・木材・焚き火・加工設備はリセットされます。`))return;
     const stars=Number(s.stars||0)+reward,prestiges=Number(s.prestiges||0)+1,totalStarsEarned=Number(s.totalStarsEarned||0)+reward;
-    const keep={stars,prestiges,totalStarsEarned,achievements:s.achievements.slice(),discoveredWoodTypes:s.discoveredWoodTypes.slice(),found:s.found,legacyFound:s.legacyFound||0,starSkills:{...s.starSkills},bestPrestigeReward:reward,milestones:s.milestones||[],totalEarned:s.totalEarned||0,lifetimeLogs:s.lifetimeLogs||s.totalLogs||0,totalPlanksMade:s.totalPlanksMade||0,craftJobsCompleted:s.craftJobsCompleted||0};
+    const keep={stars,prestiges,totalStarsEarned,achievements:s.achievements.slice(),discoveredWoodTypes:s.discoveredWoodTypes.slice(),found:s.found,legacyFound:s.legacyFound||0,starSkills:{...s.starSkills},bestPrestigeReward:reward,milestones:s.milestones||[],totalEarned:s.totalEarned||0,lifetimeLogs:s.lifetimeLogs||s.totalLogs||0,totalPlanksMade:s.totalPlanksMade||0,craftJobsCompleted:s.craftJobsCompleted||0,v5:s.v5?{
+      summitPoints:Number(s.v5.summitPoints||0),summitCount:Number(s.v5.summitCount||0),
+      unlockedRegions:Array.isArray(s.v5.unlockedRegions)?s.v5.unlockedRegions.slice():['snowfield'],
+      discoveries:{...(s.v5.discoveries||{})},fish:{...(s.v5.fish||{})},totalFish:Number(s.v5.totalFish||0),
+      treasureFinds:Number(s.v5.treasureFinds||0),bossWins:Number(s.v5.bossWins||0),
+      totalExpeditions:Number(s.v5.totalExpeditions||0),totalResearch:Number(s.v5.totalResearch||0),
+      summitHistory:Array.isArray(s.v5.summitHistory)?s.v5.summitHistory.slice():[],activePage:'summit'
+    }:undefined};
     s=defaults();Object.assign(s,keep);s.logHp=woods[0].hp;s.lastSeen=now();s.version=4;ensureV4();checkV4Achievements();toast(`転生成功！ 山の星 ${reward} 個を獲得！`);renderAll();save();
   };
 
@@ -404,8 +411,19 @@
       }
     }
     if(s.craftJob && Number(s.craftJob.finishAt||0)<=current) finishCrafting();
-    if(document.getElementById('page-crafting')?.classList.contains('active')) renderCrafting();
-    if(document.getElementById('page-firepit')?.classList.contains('active')) renderFirepit();
+    if(document.getElementById('page-crafting')?.classList.contains('active')){
+      const job=s.craftJob;
+      const remain=job?Math.max(0,Math.ceil((Number(job.finishAt)-current)/1000)):0;
+      const label=document.getElementById('craftRemaining');
+      if(label)label.textContent=`${Math.floor(remain/60)}分 ${remain%60}秒`;
+      const bar=document.getElementById('craftProgressBar');
+      if(bar&&job){const pct=Math.max(0,Math.min(100,(1-remain/Math.max(1,Number(job.totalSeconds)||1))*100));bar.style.width=pct+'%';}
+    }
+    if(document.getElementById('page-firepit')?.classList.contains('active')){
+      const buff=document.querySelector('#firepitPanel .firepit-buff');
+      if(buff&&Number(s.fireBuffUntil||0)>current){const left=Math.ceil((s.fireBuffUntil-current)/1000);buff.innerHTML=`🔥 焚き火の加護 発動中：残り ${Math.floor(left/60)}分 ${left%60}秒<br>攻撃力・売却倍率・自動木こり速度がそれぞれ20%アップ！`;}
+      else if(buff&&Number(s.fireBuffUntil||0)<=current)renderFirepit();
+    }
     if(s.fireBuffUntil && Number(s.fireBuffUntil)<=current && s.fireBuffExpiredNotice!==true){
       s.fireBuffExpiredNotice=true;
       toast('焚き火の加護が終了しました。');
